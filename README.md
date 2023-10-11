@@ -1,72 +1,44 @@
-# Scaffold
+# App Service Auth
 
-Use this template to bootstrap a new repository with ready to use automation for deploying Azure services.
-
-The workflow is comprised of three stages - build, test and deploy. These stages can be customized as needed for different deployment scenarios.
-
-Within the `src/` directory, there are the following artifacts:
-
-- `main.bicep` This Bicep file that will load defaults, user-defined settings and resource modules
-- `main.bicepparam` This Bicep parameter file handles environment specific settings
-- `bicepconfig.json` This JSON file will customize the Bicep development experience
-- `defaults.json` This JSON file provides Bicep with a set of re-usable common values
-- `modules/` This contains resource groups and resource modules to quickly get started
+This repository provides the infra-as-code components to quickly deploy a sample Azure App Service with Entra ID Authentication.
 
 ---
 
 ## Getting Started
 
-### Deployment
+Create Resource Group
 
-#### Local Commands
-
-```bash
-az deployment sub create \
-  --name '' \
-  --location '' \
-  --template-file './src/main.bicep' \
-  --parameters './src/main.bicepparam'
+```shell
+az group create -n '' -l ''
 ```
 
-```powershell
-New-AzSubscriptionDeployment `
-  -Name "" `
-  -Location "" `
-  -TemplateFile "./src/main.bicep" `
-  -TemplateParameterFile "./src/main.bicepparam"
+Create Entra ID App Registration
+
+```shell
+az ad app create \
+    --display-name '' \
+    --sign-in-audience 'AzureADMyOrg' \
+    --required-resource-accesses '[{"resourceAppId":"00000003-0000-0000-c000-000000000000","resourceAccess":[{"id":"e1fe6dd8-ba31-4d61-89e7-88639da4683d","type":"Scope"}]}]' \
+    --web-redirect-uris 'https://APPLICATION_NAME.azurewebsites.net/.auth/login/aad/callback' \
+    --enable-id-token-issuance true
 ```
 
-#### GitHub Actions
+Replace the 'APPLICATION_NAME' and 'APPLICATION_ID' values in the `app.json` file
 
-Azure Active Directory - Application
+```shell
+az ad app update \
+    --id '' \
+    --set api=@./src/app.json
 
-- Navigate to the 'App Registration' blade wihin the Azure portal
-- Select 'New registration' and provide a Name for the application
-- Select the newly created application and select 'Certificates & secrets'
-- Select 'Federated Credentials' and 'Add credential'
-- Provide the 'Organization (username)' and Repository for the credential
-- Select 'Entity type' - Branch and provide 'main'
-- Repeat process for 'Entity type' - Pull Request
+az ad app credential reset \
+    --id '' \
+    --display-name
+```
 
-Azure Resource Manager - Role Assignment
+Update the `main.bicepparam` file
 
-- Navigate to the Subscription in the Azure portal
-- Select 'Access control (IAM)' and 'Add' - 'Add role assignment'
-- Select Role - Contributor and select 'Members'
-- Provide the 'Name' of the application from the previous steps
+Deploy the Bicep template
 
-GitHub Actions - Secrets
-
-- Navigate to 'Settings' on the repository
-- Select 'Secrets' and 'Actions' link
-- Select 'New repository secret' and create secrets for the following:
-  - AZURE_TENANT_ID
-  - AZURE_SUBSCRIPTION_ID
-  - AZURE_CLIENT_ID
-
----
-
-### Links
-
-- [Bicep](https://github.com/Azure/bicep)
-- [Templates](https://docs.microsoft.com/azure/templates)
+```shell
+az deployment group create -g '' -n 'Microsoft.Resources' -f ./src/main.bicep -p ./src/main.bicepparam
+```
