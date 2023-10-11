@@ -1,16 +1,15 @@
 using './main.bicep'
 
 param resources = {
-  location: ''
+  location: 'uksouth'
+  applications: {
+    name: ''
+    displayName: ''
+  }
   serverfarms: {
     name: ''
   }
   sites: {
     name: ''
   }
-}
-
-param credentials = {
-  clientId: ''
-  clientSecret: ''
 }

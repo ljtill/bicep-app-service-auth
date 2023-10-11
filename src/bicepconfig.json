@@ -13,7 +13,10 @@
   "cloud": {
     "currentProfile": "AzureCloud"
   },
-  "experimentalFeaturesEnabled": {},
+  "experimentalFeaturesEnabled": {
+    "extensibility": true,
+    "microsoftGraphPreview": true
+  },
   "moduleAliases": {
     "ts": {},
     "br": {}
