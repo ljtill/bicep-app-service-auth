@@ -49,5 +49,9 @@ az group create -n '' -l ''
 Deploy the Bicep template
 
 ```shell
-az deployment group create -g '' -n 'Microsoft.Resources' -f ./src/resources/main.bicep -p ./src/resources/main.bicepparam
+az deployment group create \
+    -g '' \
+    -n 'Microsoft.Resources' \
+    -f ./src/resources/main.bicep \
+    -p ./src/resources/main.bicepparam
 ```
