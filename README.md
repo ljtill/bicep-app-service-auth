@@ -22,6 +22,6 @@ Deploy the Bicep template
 az deployment group create \
     --resource-group '' \
     --name 'Microsoft.Resources' \
-    --template-file ./src/resources/main.bicep \
-    --parameters ./src/resources/main.bicepparam
+    --template-file ./src/main.bicep \
+    --parameters ./src/main.bicepparam
 ```
