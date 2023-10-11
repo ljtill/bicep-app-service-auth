@@ -1,0 +1,18 @@
+{
+    "acceptMappedClaims": null,
+    "knownClientApplications": [],
+    "oauth2PermissionScopes": [
+        {
+            "adminConsentDescription": "Allow the application to access APP_NAME on behalf of the signed-in user.",
+            "adminConsentDisplayName": "Access APP_NAME",
+            "id": "APP_ID",
+            "isEnabled": true,
+            "type": "User",
+            "userConsentDescription": "Allow the application to access APP_NAME on your behalf.",
+            "userConsentDisplayName": "Access APP_NAME",
+            "value": "user_impersonation"
+        }
+    ],
+    "preAuthorizedApplications": [],
+    "requestedAccessTokenVersion": null
+}
