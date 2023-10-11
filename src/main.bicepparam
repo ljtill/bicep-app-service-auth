@@ -1,15 +1,16 @@
 using './main.bicep'
 
-param settings = {
-  subscriptionId: ''
-  resourceGroups: [
-    {
-      name: ''
-      location: ''
-      tags: {}
-    }
-  ]
-  resources: {
-    tags: {}
+param resources = {
+  location: ''
+  serverfarms: {
+    name: ''
   }
+  sites: {
+    name: ''
+  }
+}
+
+param credentials = {
+  clientId: ''
+  clientSecret: ''
 }
