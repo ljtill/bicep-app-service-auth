@@ -1,6 +1,8 @@
 # App Service Auth
 
-This repository provides the infra-as-code components to quickly deploy a sample Azure App Service with Entra IDgit c Authentication.
+This repository provides the infra-as-code components to quickly deploy Azure App Service with Entra ID Authentication.
+
+_Please note this repository is under development and subject to change._
 
 ---
 
