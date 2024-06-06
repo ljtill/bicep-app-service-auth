@@ -4,9 +4,66 @@
 
 targetScope = 'resourceGroup'
 
+// -------
+// Imports
+// -------
+
+import 'microsoftGraph@1.0.0'
+
 // ---------
 // Resources
 // ---------
+
+// Graph
+
+resource application 'Microsoft.Graph/applications@beta' = {
+  name: guid(subscription().subscriptionId, resources.applications.name)
+  displayName: resources.applications.displayName
+  signInAudience: 'AzureADMyOrg'
+  identifierUris: [
+    'api://${tenant().tenantId}/${resources.sites.name}'
+  ]
+  requiredResourceAccess: [
+    {
+      resourceAppId: '00000003-0000-0000-c000-000000000000'
+      resourceAccess: [
+        {
+          id: 'e1fe6dd8-ba31-4d61-89e7-88639da4683d'
+          type: 'Scope'
+        }
+      ]
+    }
+  ]
+  api: {
+    oauth2PermissionScopes: [
+      {
+        id: guid(subscription().subscriptionId, resources.applications.name)
+        isEnabled: true
+        type: 'User'
+        value: 'user_impersonation'
+        adminConsentDisplayName: 'Access ${resources.applications.name}'
+        adminConsentDescription: 'Allow the application to access ${resources.applications.name} on behalf of the signed-in user.'
+        userConsentDisplayName: 'Access ${resources.applications.name}'
+        userConsentDescription: 'Allow the application to access ${resources.applications.name} on your behalf.'
+      }
+    ]
+  }
+  web: {
+    redirectUris: [
+      'https://${resources.sites.name}.azurewebsites.net/.auth/login/aad/callback'
+    ]
+    implicitGrantSettings: {
+      enableIdTokenIssuance: true
+    }
+  }
+}
+
+resource servicePrincipal 'Microsoft.Graph/servicePrincipals@beta' = {
+  appId: application.appId
+
+}
+
+// Azure
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: resources.serverfarms.name
@@ -29,12 +86,6 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
     serverFarmId: appServicePlan.id
     siteConfig: {
       linuxFxVersion: 'NODE|18-lts'
-      appSettings: [
-        {
-          name: 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
-          value: credentials.clientSecret
-        }
-      ]
     }
     clientAffinityEnabled: false
     httpsOnly: true
@@ -87,8 +138,7 @@ resource authsettingsV2 'Microsoft.Web/sites/config@2022-09-01' = {
         enabled: true
         registration: {
           openIdIssuer: 'https://sts.windows.net/${tenant().tenantId}/v2.0'
-          clientId: credentials.clientId
-          clientSecretSettingName: 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
+          clientId: application.appId
         }
         login: {
           disableWWWAuthenticate: false
@@ -97,7 +147,7 @@ resource authsettingsV2 'Microsoft.Web/sites/config@2022-09-01' = {
           defaultAuthorizationPolicy: {}
           jwtClaimChecks: {}
           allowedAudiences: [
-            'api://${credentials.clientId}'
+            'api://${tenant().tenantId}/${resources.sites.name}'
           ]
         }
       }
@@ -124,7 +174,6 @@ resource authsettingsV2 'Microsoft.Web/sites/config@2022-09-01' = {
       }
       customOpenIdConnectProviders: {}
     }
-
   }
 }
 
@@ -133,6 +182,3 @@ resource authsettingsV2 'Microsoft.Web/sites/config@2022-09-01' = {
 // ----------
 
 param resources object
-
-@secure()
-param credentials object
